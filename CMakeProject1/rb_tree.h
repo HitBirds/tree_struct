@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+using namespace std;
 #include "rb_tree_node.h"
 /*
  *封装RB_NODE的树结构
@@ -20,16 +21,16 @@ public:
 	int Delete_Node(T delete_data);
 	My_RB_Tree_Node<T>* Search_Node(T sr_data);
 	//中序遍历 输入root* 和 vector*，结果vector里保存了中序遍历的节点顺序，也可以自己用二级指针来实现vector
-	void Mid_Traversal(My_RB_Tree_Node<T>* root,vector<My_RB_Tree_Node<T>*>* mid_vec);
+	void Mid_Traversal(My_RB_Tree_Node<T>* root, vector<My_RB_Tree_Node<T>*>* mid_vec);
 private:
 	//插入时导致不平衡的调整
-	void Insert_Case1(My_RB_Tree_Node<T>* p_node, const T& insert_data);
-	void Insert_Case2(My_RB_Tree_Node<T>* p_node, const T& insert_data);
-	void Insert_Case3(My_RB_Tree_Node<T>* p_node, const T& insert_data);
-	void Insert_Case4(My_RB_Tree_Node<T>* p_node, const T& insert_data);
-	void Insert_Case5(My_RB_Tree_Node<T>* p_node, const T& insert_data);
+	void Insert_Case1(My_RB_Tree_Node<T>* n_node);
+	void Insert_Case2(My_RB_Tree_Node<T>* n_node);
+	void Insert_Case3(My_RB_Tree_Node<T>* n_node);
+	void Insert_Case4(My_RB_Tree_Node<T>* n_node);
+	void Insert_Case5(My_RB_Tree_Node<T>* n_node);
 	//删除时导致不平衡的调整
-	void Fix_Tree_Delete(My_RB_Tree_Node<T>* current_node);
+	void Delete_Case1(My_RB_Tree_Node<T>* n_node);
 
 	
 	//寻找G

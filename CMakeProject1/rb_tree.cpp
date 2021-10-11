@@ -1,4 +1,5 @@
 #include <vector>
+using namespace std;
 #include "rb_tree.h"
 template<class T>
 RB_Tree<T>::RB_Tree(T root_data)
@@ -13,6 +14,10 @@ RB_Tree<T>::~RB_Tree()
 	root = nullptr;
 }
 
+/*
+* 左旋 P,R不为空
+* 只是更改R所指向节点里指针的指向，不更改指针R本身的值
+*/
 template<class T>
 void RB_Tree<T>::Left_Rotate(My_RB_Tree_Node<T>* r_node)
 {
@@ -35,6 +40,10 @@ void RB_Tree<T>::Left_Rotate(My_RB_Tree_Node<T>* r_node)
 	if (p->left_child->left_child != nullptr)p->left_child->left_child->father_node = p->left_child;
 }
 
+/*
+* 右旋 P,L不为空
+* 只是更改L所指向节点里指针的指向，不更改指针L本身的值
+*/
 template<class T>
 void RB_Tree<T>::Right_Rotate(My_RB_Tree_Node<T>* l_node)
 {
@@ -75,61 +84,91 @@ int RB_Tree<T>::Insert_Node(T insert_data)
 		if (insert_data < cur->data)cur = cur->left_child;
 		else cur = cur->right_child;
 	}
-	return Insert_Case1(pre,&insert_data);
+	//先按照待插入节点是红色来插入，然后再调整
+	My_RB_Tree_Node<T>* N = new My_RB_Tree_Node<T>(insert_data);
+	N->color_tag = RED;
+	if (pre == nullptr)
+	{
+		this->root = N;
+	}
+	else
+	{
+		if (insert_data < pre->data)
+		{
+			pre->left_child = N;
+			pre->left_child->father_node = pre;
+		}
+		else
+		{
+			pre->right_child = N;
+			pre->right_child->father_node = pre;
+		}
+	}
+	return Insert_Case1(N,&insert_data);
 }
 
 
 //插入时导致不平衡的调整 case1 N是根
 template<class T>
-void RB_Tree<T>::Insert_Case1(My_RB_Tree_Node<T>* p_node, const T& insert_data)
+void RB_Tree<T>::Insert_Case1(My_RB_Tree_Node<T>* n_node)
 {
-	if (p_node == nullptr)
+	if (n_node->father_node == nullptr)
 	{
-		this->root = new My_RB_Tree_Node<T>(insert_data);
-		root->color_tag = BLACK;
+		this->root->color_tag = BLACK;
 		return;
 	}
-	return Insert_Case2(p_node, insert_data);
+	return Insert_Case2(n_node, insert_data);
 }
 
-//case 2 N的P是黑色时
+//case 2 N的P是黑色时 直接插入不影响 红黑树的条件4，5
 template<class T>
-void RB_Tree<T>::Insert_Case2(My_RB_Tree_Node<T>* p_node, const T& insert_data)
+void RB_Tree<T>::Insert_Case2(My_RB_Tree_Node<T>* n_node)
 {
-	if (p_node->color_tag == BLACK)
+	if (n_node->father_node->color_tag == BLACK)
 	{
-		if (insert_data < p_node)
-		{
-			p_node->left_child = new My_RB_Tree_Node<T>(insert_data);
-			p_node->left_child->father_node = p_node;
-		}
-		else
-		{
-			p_node->right_child = new My_RB_Tree_Node<T>(insert_data);
-			p_node->right_child->father_node = p_node;
-		}
 		return;
 	}
-	return Insert_Case3(p_node, insert_data);
+	return Insert_Case3(n_node, insert_data);
 }
 
 //case 3 N的P是红色时
 template<class T>
-void RB_Tree<T>::Insert_Case3(My_RB_Tree_Node<T>* p_node, const T& insert_data)
+void RB_Tree<T>::Insert_Case3(My_RB_Tree_Node<T>* n_node)
 {
-
+	My_RB_Tree_Node<T>* U = Find_Node_U(n_node);
+	My_RB_Tree_Node<T>* G = Find_Node_G(n_node);
+	//3.1叔父是红色，调整P,U和G，把G当N入循环
+	if (U != nullptr && U->color_tag == RED)
+	{
+		n_node->father_node->color_tag = BLACK;
+		U->color_tag = BLACK;
+		G->color_tag = RED;
+		return Insert_Case1(G);
+	}
+	else
+	{
+		return Insert_Case4(n_node);
+	}
 }
 
+//3.2叔父是黑色的或者为空（可能N的兄弟是黑，或者兄弟是空，所以U是黑或者空）
 template<class T>
-void RB_Tree<T>::Insert_Case4(My_RB_Tree_Node<T>* p_node, const T& insert_data)
+void RB_Tree<T>::Insert_Case4(My_RB_Tree_Node<T>* n_node)
 {
-
+	//3.2.1若N是P的右子 左旋N,P 变 N为P,  P为N的左子，  转3.2.2
+	if (n_node == n_node->father_node->right_child)Left_Rotate(n_node);
+	return Insert_Case5(n_node->left_child);
 }
 
+//case  3.2.2 N,P红,U黑(空) N为左子
 template<class T>
-void RB_Tree<T>::Insert_Case5(My_RB_Tree_Node<T>* p_node, const T& insert_data)
+void RB_Tree<T>::Insert_Case5(My_RB_Tree_Node<T>* n_node)
 {
-
+	//右旋P,G,对调颜色
+	Right_Rotate(n_node->father_node);
+	n_node->father_node->color_tag = BLACK;
+	n_node->father_node->right_child->color_tag = RED;
+	return;
 }
 
 
@@ -185,7 +224,7 @@ void RB_Tree<T>::Mid_Traversal(My_RB_Tree_Node<T>* root, vector<My_RB_Tree_Node<
 
 //删除时导致不平衡的调整
 template<class T>
-void RB_Tree<T>::Fix_Tree_Delete(My_RB_Tree_Node<T>* current_node)
+void RB_Tree<T>::Delete_Case1(My_RB_Tree_Node<T>* n_node)
 {
 
 }
