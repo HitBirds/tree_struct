@@ -180,21 +180,67 @@ template<class T>
 int RB_Tree<T>::Delete_Node(T delete_data)
 {
 	//寻找删除位置
-	My_RB_Tree_Node<T>* pre(nullptr), *cur(nullptr);
-	cur = root;
-	while (cur != nullptr)
-	{
-		pre = cur;
-		if (insert_data == cur->data)break;
-		if (insert_data < cur->data)cur = cur->left_child;
-		else cur = cur->right_child;
-	}
-	if (pre == nullptr)return -1;
+	My_RB_Tree_Node<T> *cur(nullptr);
+	
+	int res(0);
+	cur = Search_Node(delete_data);
+	if (cur == nullptr)res = -1;
 	else
 	{
-		//删除pre,进行‘直接前驱’替换调整
+		//delete case1
+		Delete_Case1(cur);
 	}
-	return 0;
+	return res;
+}
+
+//case1 待删除节点P有两个儿子(儿子指非叶子节点，注意:wiki红黑树定义3，NIL节点是叶子)
+template<class T>
+void RB_Tree<T>::Delete_Case1(My_RB_Tree_Node<T>* p_node)
+{
+	if (p_node->left_child != nullptr && p_node->right_child != nullptr)
+	{
+		vector<My_RB_Tree_Node<T>*> mid_vec;
+		Mid_Traversal(this->root, &mid_vec);
+		auto it = mid_vec.front();
+		while (it != mid_vec.end())
+		{
+			if (*it == p_node)break;
+			++it;
+		}
+		//这里用直接后继来替换 //有两个儿子怎么可能会没有直接后继?所以不用判断it != mid_vec.end()
+		T tmp = p_node->data;
+		p_node->data = (*it)->data;
+		//p_node指向直接后继
+		p_node = *it;
+		p_node->data = tmp;
+	}
+	//替换完毕,转case2
+	return Delete_Case2(p_node);
+}
+
+//case2 待删除节点没有儿子(只有两个叶子(nil))则任选1个叶子看作儿子节点
+template<class T>
+void RB_Tree<T>::Delete_Case2(My_RB_Tree_Node<T>* p_node)
+{
+
+}
+
+template<class T>
+void RB_Tree<T>::Delete_Case3(My_RB_Tree_Node<T>* p_node)
+{
+
+}
+
+template<class T>
+void RB_Tree<T>::Delete_Case4(My_RB_Tree_Node<T>* p_node)
+{
+
+}
+
+template<class T>
+void RB_Tree<T>::Delete_Case5(My_RB_Tree_Node<T>* p_node)
+{
+
 }
 
 template<class T>
@@ -215,7 +261,7 @@ template<class T>
 void RB_Tree<T>::Mid_Traversal(My_RB_Tree_Node<T>* root, vector<My_RB_Tree_Node<T>*>* mid_vec)
 {
 	if (root == nullptr)return;
-	Mid_Traversal(root->left_child,mid_vec);
+	Mid_Traversal(root->left_child, mid_vec);
 	mid_vec->push_back(root);
 	Mid_Traversal(root->right_child, mid_vec);
 	return void;

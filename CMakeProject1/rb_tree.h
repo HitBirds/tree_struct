@@ -30,8 +30,11 @@ private:
 	void Insert_Case4(My_RB_Tree_Node<T>* n_node);
 	void Insert_Case5(My_RB_Tree_Node<T>* n_node);
 	//删除时导致不平衡的调整
-	void Delete_Case1(My_RB_Tree_Node<T>* n_node);
-
+	void Delete_Case1(My_RB_Tree_Node<T>* p_node);
+	void Delete_Case2(My_RB_Tree_Node<T>* p_node);
+	void Delete_Case3(My_RB_Tree_Node<T>* p_node);
+	void Delete_Case4(My_RB_Tree_Node<T>* p_node);
+	void Delete_Case5(My_RB_Tree_Node<T>* p_node);
 	
 	//寻找G
 	My_RB_Tree_Node<T>* Find_Node_G(My_RB_Tree_Node<T>* current_node);
