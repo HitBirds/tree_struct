@@ -4,7 +4,7 @@ using namespace std;
 template<class T>
 RB_Tree<T>::RB_Tree(T root_data)
 {
-	this->root = new My_RB_Tree_Node(root_data);
+    this->root = new My_RB_Tree_Node<T>(root_data);
 }
 
 template<class T>
@@ -104,7 +104,7 @@ int RB_Tree<T>::Insert_Node(T insert_data)
 			pre->right_child->father_node = pre;
 		}
 	}
-	return Insert_Case1(N,&insert_data);
+    return Insert_Case1(N);
 }
 
 
@@ -117,7 +117,7 @@ void RB_Tree<T>::Insert_Case1(My_RB_Tree_Node<T>* n_node)
 		this->root->color_tag = BLACK;
 		return;
 	}
-	return Insert_Case2(n_node, insert_data);
+    return Insert_Case2(n_node);
 }
 
 //case 2 N的P是黑色时 直接插入不影响 红黑树的条件4，5
@@ -128,7 +128,7 @@ void RB_Tree<T>::Insert_Case2(My_RB_Tree_Node<T>* n_node)
 	{
 		return;
 	}
-	return Insert_Case3(n_node, insert_data);
+    return Insert_Case3(n_node);
 }
 
 //case 3 N的P是红色时
@@ -218,30 +218,132 @@ void RB_Tree<T>::Delete_Case1(My_RB_Tree_Node<T>* p_node)
 	return Delete_Case2(p_node);
 }
 
-//case2 待删除节点没有儿子(只有两个叶子(nil))则任选1个叶子看作儿子节点
+
+//待删除节点没有儿子(只有两个叶子(nil))则任选1个叶子看作儿子节点(假儿子)
+//CASE2 待删除结点有1个儿子
 template<class T>
 void RB_Tree<T>::Delete_Case2(My_RB_Tree_Node<T>* p_node)
 {
-
+    //2-1  当待删除结点为红色时(根据红黑树定义可知,其父子都不为红色,且其子为nil)直接用儿子结点替换
+    if(p_node == nullptr)return;
+    if(p_node->color_tag == RED)
+    {
+        auto g=p_node->father_node;
+        if(p_node == g->left_child)g->left_child = p_node->left_child;
+        else g->right_child = p_node->left_child;
+        erase_Node(p_node);
+        delete p_node;
+        p_node = nullptr;
+    }
+    else return Delete_Case3(p_node);
 }
 
+//2-2  待删除结点是黑色
+//-1 但它儿子是红色(红色必有两个空叶子) 把儿子改成黑色顶替待删除结点
 template<class T>
 void RB_Tree<T>::Delete_Case3(My_RB_Tree_Node<T>* p_node)
 {
-
+    if(p_node == nullptr || p_node->color_tag != BLACK)return;
+    My_RB_Tree_Node<T>* c = nullptr;
+    if(p_node->left_child != nullptr && p_node->left_child->color_tag == RED)
+    {
+        c = p_node->left_child;
+        p_node->left_child = c->left_child;
+        delete c->right_child;//出于安全考虑而已
+        c->right_child = nullptr;
+        p_node->data = c->data;
+        erase_Node(c);
+        delete c;
+        c = nullptr;
+    }
+    else if(p_node->right_child != nullptr && p_node->right_child->color_tag == RED)
+    {
+        c = p_node->right_child;
+        p_node->right_child = c->right_child;
+        delete c->left_child;//出于安全考虑而已
+        c->left_child = nullptr;
+        p_node->data = c->data;
+        erase_Node(c);
+        delete c;
+        c = nullptr;
+    }
+    return Delete_Case4(p_node);
 }
 
+//2-2
+//-2  待删除结点是黑色,它儿子也是黑色(根据红黑树的定义它的两个儿子必为叶子)
 template<class T>
 void RB_Tree<T>::Delete_Case4(My_RB_Tree_Node<T>* p_node)
 {
-
+    if(p_node == nullptr)return;
+    auto G = p_node->father_node;
+    //把P用它的孩子替换,它的儿子为N
+    if(G != nullptr)
+    {
+        if(p_node == G->left_node)G->left_node = p_node->left_child;//其实left_child === nullptr
+        else G->right_node = p_node->left_child;
+        G->left_child->father_node = G;
+        G->right_child->father_node = G;
+    }
+    erase_Node(p_node);
+    delete p_node;
+    p_node = nullptr;
+    return Delete_Case5(G);
 }
 
+//2-2-2
+//-1 P黑N黑替换后,若N是根
 template<class T>
 void RB_Tree<T>::Delete_Case5(My_RB_Tree_Node<T>* p_node)
 {
-
+    if(p_node == nullptr)return;
+    else Delete_Case6(p_node);
 }
+
+//替换后,N不是根,则P非空,根据P和S的颜色分情况讨论 BB BR RB
+//2-2-2
+//-2 P:B S:R
+//必然:SL:B SR:B
+template<class T>
+void RB_Tree<T>::Delete_Case6(My_RB_Tree_Node<T>* p_node)
+{
+   My_RB_Tree_Node<T>* S = Find_Node_S_byP(p_node);
+   if(S != nullptr && S->color_tag == RED)
+   {
+       S->color_tag = BLACK;
+       p_node->color_tag = RED;
+       if(p_node->right_child == S)Left_Rotate(S);
+       else Right_Rotate(S);
+   }
+   //由于N多了一个兄弟 SL和SR至少有1个孩子,按照wiki上的转情况4,5,6(对应这里的8,9,10)
+   Delete_Case7(p_node);
+}
+
+//2-2-2
+//-3 P:B S:B
+//假设SL,SR为BB
+template<class T>
+void RB_Tree<T>::Delete_Case7(My_RB_Tree_Node<T>* p_node)
+{
+    if(p_node->color_tag == BLACK){
+        My_RB_Tree_Node<T>* S = Find_Node_S_byP(p_node);
+        if(S != nullptr && is_Black(S->left_child) && is_Black(S->right_child))
+        {
+            S->color_tag = RED;
+            //rebalance P
+            Delete_Case5(p_node->father_node);
+        }
+    }
+    return Delete_Case8(p_node);
+}
+
+template<class T>
+void RB_Tree<T>::Delete_Case8(My_RB_Tree_Node<T>* p_node)
+{
+    if(p_node == nullptr)return;
+    else Delete_Case6(p_node);
+}
+
 
 template<class T>
 My_RB_Tree_Node<T>* RB_Tree<T>::Search_Node(T sr_data)
@@ -264,15 +366,7 @@ void RB_Tree<T>::Mid_Traversal(My_RB_Tree_Node<T>* root, vector<My_RB_Tree_Node<
 	Mid_Traversal(root->left_child, mid_vec);
 	mid_vec->push_back(root);
 	Mid_Traversal(root->right_child, mid_vec);
-	return void;
-}
-
-
-//删除时导致不平衡的调整
-template<class T>
-void RB_Tree<T>::Delete_Case1(My_RB_Tree_Node<T>* n_node)
-{
-
+    return;
 }
 
 
@@ -296,22 +390,34 @@ My_RB_Tree_Node<T>* RB_Tree<T>::Find_Node_U(My_RB_Tree_Node<T>* current_node)
 	return nullptr;
 }
 
-//删除时寻找儿子的叔父节点S
+//删除时寻找S
 template<class T>
-My_RB_Tree_Node<T>* RB_Tree<T>::Find_Node_S(My_RB_Tree_Node<T>* current_node)
+My_RB_Tree_Node<T>* RB_Tree<T>::Find_Node_S_byP(My_RB_Tree_Node<T>* current_node)
 {
-	if (current_node != nullptr && current_node->father_node != nullptr)
+    if (current_node != nullptr)
 	{
-		if (current_node == current_node->father_node->left_child)return current_node->father_node->right_child;
-		else return current_node->father_node->left_child;
-	}
+        if(current_node->left_child == nullptr)return current_node->right_child;
+        else return current_node->left_child;
+    }
 	return nullptr;
+}
+
+template<class T>
+My_RB_Tree_Node<T>* RB_Tree<T>::Find_Node_S_byN(My_RB_Tree_Node<T>* current_node)
+{
+    if (current_node != nullptr && current_node->father_node != nullptr)
+    {
+        if (current_node == current_node->father_node->left_child)return current_node->father_node->right_child;
+        else return current_node->father_node->left_child;
+    }
+    return nullptr;
 }
 
 //清空节点数据
 template<class T>
 void RB_Tree<T>::erase_Node(My_RB_Tree_Node<T>* current_node)
 {
+    if(current_node == nullptr)return;
 	current_node->data = NULL;
 	current_node->color_tag = Null;
 	current_node->father_child = nullptr;

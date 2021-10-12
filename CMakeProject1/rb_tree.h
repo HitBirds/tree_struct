@@ -35,13 +35,23 @@ private:
 	void Delete_Case3(My_RB_Tree_Node<T>* p_node);
 	void Delete_Case4(My_RB_Tree_Node<T>* p_node);
 	void Delete_Case5(My_RB_Tree_Node<T>* p_node);
+    void Delete_Case6(My_RB_Tree_Node<T>* p_node);
+    void Delete_Case7(My_RB_Tree_Node<T>* p_node);
+    void Delete_Case8(My_RB_Tree_Node<T>* p_node);
 	
+    //判断黑 隐式内联
+    bool is_Black(My_RB_Tree_Node<T>* c)
+    {
+        return c == nullptr || c->color_tag == BLACK;
+    }
+
 	//寻找G
 	My_RB_Tree_Node<T>* Find_Node_G(My_RB_Tree_Node<T>* current_node);
 	//寻找U
 	My_RB_Tree_Node<T>* Find_Node_U(My_RB_Tree_Node<T>* current_node);
 	//删除时寻找兄弟节点S
-	My_RB_Tree_Node<T>* Find_Node_S(My_RB_Tree_Node<T>* current_node);
+    My_RB_Tree_Node<T>* Find_Node_S_byN(My_RB_Tree_Node<T>* current_node);
+    My_RB_Tree_Node<T>* Find_Node_S_byP(My_RB_Tree_Node<T>* p_node);
 
 	//清空节点数据
 	void erase_Node(My_RB_Tree_Node<T>* current_node);
