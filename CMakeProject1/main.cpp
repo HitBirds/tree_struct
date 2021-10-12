@@ -1,7 +1,7 @@
 ﻿// CMakeProject1.cpp: 定义应用程序的入口点。
 //
 
-#include "CMakeProject1.h"
+#include "main.h"
 
 using namespace std;
 

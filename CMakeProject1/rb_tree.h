@@ -1,12 +1,12 @@
-#pragma once
+ï»¿#pragma once
 #include <vector>
 using namespace std;
 #include "rb_tree_node.h"
 /*
- *·â×°RB_NODEµÄÊ÷½á¹¹
- *Êı¾İ³ÉÔ±:root
- *²Ù×÷:³õÊ¼»¯£¬Îö¹¹£¬×óĞı×ª£¬ÓÒĞı×ª£¬²åÈë½Úµã£¬É¾³ı½Úµã£¬
- *ÖĞĞò±éÀú£¬Çå¿Õ½ÚµãÊı¾İ,²éÕÒ½áµã
+ *å°è£…RB_NODEçš„æ ‘ç»“æ„
+ *æ•°æ®æˆå‘˜:root
+ *æ“ä½œ:åˆå§‹åŒ–ï¼Œææ„ï¼Œå·¦æ—‹è½¬ï¼Œå³æ—‹è½¬ï¼Œæ’å…¥èŠ‚ç‚¹ï¼Œåˆ é™¤èŠ‚ç‚¹ï¼Œ
+ *ä¸­åºéå†ï¼Œæ¸…ç©ºèŠ‚ç‚¹æ•°æ®,æŸ¥æ‰¾ç»“ç‚¹
 */
 template<class T>
 class RB_Tree
@@ -20,16 +20,16 @@ public:
 	int Insert_Node(T insert_data);
 	int Delete_Node(T delete_data);
 	My_RB_Tree_Node<T>* Search_Node(T sr_data);
-	//ÖĞĞò±éÀú ÊäÈëroot* ºÍ vector*£¬½á¹ûvectorÀï±£´æÁËÖĞĞò±éÀúµÄ½ÚµãË³Ğò£¬Ò²¿ÉÒÔ×Ô¼ºÓÃ¶ş¼¶Ö¸ÕëÀ´ÊµÏÖvector
+	//ä¸­åºéå† è¾“å…¥root* å’Œ vector*ï¼Œç»“æœvectoré‡Œä¿å­˜äº†ä¸­åºéå†çš„èŠ‚ç‚¹é¡ºåºï¼Œä¹Ÿå¯ä»¥è‡ªå·±ç”¨äºŒçº§æŒ‡é’ˆæ¥å®ç°vector
 	void Mid_Traversal(My_RB_Tree_Node<T>* root, vector<My_RB_Tree_Node<T>*>* mid_vec);
 private:
-	//²åÈëÊ±µ¼ÖÂ²»Æ½ºâµÄµ÷Õû
+	//æ’å…¥æ—¶å¯¼è‡´ä¸å¹³è¡¡çš„è°ƒæ•´
 	void Insert_Case1(My_RB_Tree_Node<T>* n_node);
 	void Insert_Case2(My_RB_Tree_Node<T>* n_node);
 	void Insert_Case3(My_RB_Tree_Node<T>* n_node);
 	void Insert_Case4(My_RB_Tree_Node<T>* n_node);
 	void Insert_Case5(My_RB_Tree_Node<T>* n_node);
-	//É¾³ıÊ±µ¼ÖÂ²»Æ½ºâµÄµ÷Õû
+	//åˆ é™¤æ—¶å¯¼è‡´ä¸å¹³è¡¡çš„è°ƒæ•´
 	void Delete_Case1(My_RB_Tree_Node<T>* p_node);
 	void Delete_Case2(My_RB_Tree_Node<T>* p_node);
 	void Delete_Case3(My_RB_Tree_Node<T>* p_node);
@@ -38,21 +38,23 @@ private:
     void Delete_Case6(My_RB_Tree_Node<T>* p_node);
     void Delete_Case7(My_RB_Tree_Node<T>* p_node);
     void Delete_Case8(My_RB_Tree_Node<T>* p_node);
+	void Delete_Case9(My_RB_Tree_Node<T>* p_node);
+	void Delete_Case10(My_RB_Tree_Node<T>* p_node);
 	
-    //ÅĞ¶ÏºÚ ÒşÊ½ÄÚÁª
+    //åˆ¤æ–­é»‘ éšå¼å†…è”
     bool is_Black(My_RB_Tree_Node<T>* c)
     {
         return c == nullptr || c->color_tag == BLACK;
     }
 
-	//Ñ°ÕÒG
+	//å¯»æ‰¾G
 	My_RB_Tree_Node<T>* Find_Node_G(My_RB_Tree_Node<T>* current_node);
-	//Ñ°ÕÒU
+	//å¯»æ‰¾U
 	My_RB_Tree_Node<T>* Find_Node_U(My_RB_Tree_Node<T>* current_node);
-	//É¾³ıÊ±Ñ°ÕÒĞÖµÜ½ÚµãS
+	//åˆ é™¤æ—¶å¯»æ‰¾å…„å¼ŸèŠ‚ç‚¹S
     My_RB_Tree_Node<T>* Find_Node_S_byN(My_RB_Tree_Node<T>* current_node);
     My_RB_Tree_Node<T>* Find_Node_S_byP(My_RB_Tree_Node<T>* p_node);
 
-	//Çå¿Õ½ÚµãÊı¾İ
+	//æ¸…ç©ºèŠ‚ç‚¹æ•°æ®
 	void erase_Node(My_RB_Tree_Node<T>* current_node);
 };

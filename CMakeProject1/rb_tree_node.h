@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 /*
- *������ڵ���
- * ��Ա��ģ�����ݣ���ָ�룬����ָ�룬�Һ���ָ�룬��ɫ
+ *红黑树节点类
+ * 成员：模板数据，父指针，左孩子指针，右孩子指针，颜色
 */
 enum RB_COLOR { Null, RED = 1, BLACK };
 
