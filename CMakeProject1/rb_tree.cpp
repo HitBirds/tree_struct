@@ -205,6 +205,7 @@ int RB_Tree<T>::Delete_Node(T delete_data)
 	return res;
 }
 
+
 //case1 待删除节点P有两个儿子(儿子指非叶子节点，注意:wiki红黑树定义3，NIL节点是叶子)
 template<class T>
 void RB_Tree<T>::Delete_Case1(My_RB_Tree_Node<T>* p_node)
@@ -237,8 +238,7 @@ template<class T>
 void RB_Tree<T>::Delete_Case2(My_RB_Tree_Node<T>* p_node)
 {
     //2-1  当待删除结点为红色时(根据红黑树定义可知,其父子都不为红色,且其子为nil)直接用儿子结点替换
-    if(p_node == nullptr)return;
-    if(p_node->color_tag == RED)
+    if(p_node != nullptr && p_node->color_tag == RED)
     {
         auto g=p_node->father_node;
         if(p_node == g->left_child)g->left_child = p_node->left_child;
@@ -255,31 +255,31 @@ void RB_Tree<T>::Delete_Case2(My_RB_Tree_Node<T>* p_node)
 template<class T>
 void RB_Tree<T>::Delete_Case3(My_RB_Tree_Node<T>* p_node)
 {
-    if(p_node == nullptr || p_node->color_tag != BLACK)return;
-    My_RB_Tree_Node<T>* c = nullptr;
-    if(p_node->left_child != nullptr && p_node->left_child->color_tag == RED)
-    {
-        c = p_node->left_child;
-        p_node->left_child = c->left_child;
-        delete c->right_child;//出于安全考虑而已
-        c->right_child = nullptr;
-        p_node->data = c->data;
-        erase_Node(c);
-        delete c;
-        c = nullptr;
-    }
-    else if(p_node->right_child != nullptr && p_node->right_child->color_tag == RED)
-    {
-        c = p_node->right_child;
-        p_node->right_child = c->right_child;
-        delete c->left_child;//出于安全考虑而已
-        c->left_child = nullptr;
-        p_node->data = c->data;
-        erase_Node(c);
-        delete c;
-        c = nullptr;
-    }
-    return Delete_Case4(p_node);
+	if(p_node != nullptr && p_node->color_tag == BLACK)
+	{ 
+		My_RB_Tree_Node<T>* c = nullptr;
+		if( p_node->left_child != nullptr && p_node->left_child->color_tag == RED)
+		{
+			c = p_node->left_child;
+			p_node->left_child = c->left_child;
+      
+			p_node->data = c->data;
+			erase_Node(c);
+			delete c;
+			c = nullptr;
+		}
+		else if(p_node->right_child != nullptr && p_node->right_child->color_tag == RED)
+		{
+			c = p_node->right_child;
+			p_node->right_child = c->right_child;
+      
+			p_node->data = c->data;
+			erase_Node(c);
+			delete c;
+			c = nullptr;
+		}
+	}
+    else return Delete_Case4(p_node);
 }
 
 //2-2
@@ -287,24 +287,24 @@ void RB_Tree<T>::Delete_Case3(My_RB_Tree_Node<T>* p_node)
 template<class T>
 void RB_Tree<T>::Delete_Case4(My_RB_Tree_Node<T>* p_node)
 {
-    if(p_node == nullptr)return;
-    auto G = p_node->father_node;
-    //把P用它的孩子替换,它的儿子为N
-    if(G != nullptr)
-    {
-        if(p_node == G->left_node)G->left_node = p_node->left_child;//其实left_child === nullptr
-        else G->right_node = p_node->left_child;
-        G->left_child->father_node = G;
-        G->right_child->father_node = G;
-    }
-    erase_Node(p_node);
-    delete p_node;
-    p_node = nullptr;
-    return Delete_Case5(G);
+	if (p_node != nullptr && p_node->color_tag == BLACK) {
+		auto G = p_node->father_node;
+		//把P用它的孩子替换,它的儿子为N
+		if (G != nullptr)
+		{
+			if (p_node == G->left_node)G->left_node = p_node->left_child;//其实left_child === nullptr
+			else G->right_node = p_node->left_child;
+		}
+		erase_Node(p_node);
+		delete p_node;
+		p_node = nullptr;
+		return Delete_Case5(G);
+	}
+	return;
 }
 
-//2-2-2
-//-1 P黑N黑替换后,若N是根
+//2-2-2 P黑N黑替换后
+//-1 若N是根
 template<class T>
 void RB_Tree<T>::Delete_Case5(My_RB_Tree_Node<T>* p_node)
 {
@@ -319,16 +319,20 @@ void RB_Tree<T>::Delete_Case5(My_RB_Tree_Node<T>* p_node)
 template<class T>
 void RB_Tree<T>::Delete_Case6(My_RB_Tree_Node<T>* p_node)
 {
-   My_RB_Tree_Node<T>* S = Find_Node_S_byP(p_node);
-   if(S != nullptr && S->color_tag == RED)
-   {
-       S->color_tag = BLACK;
-       p_node->color_tag = RED;
-       if(p_node->right_child == S)Left_Rotate(S);
-       else Right_Rotate(S);
-   }
-   //由于N多了一个兄弟 SL和SR都是孩子,N的P变成了红色,S变成了SL Black孩子 ,BR变成了 RB 的情况,按照wiki上的转情况4,5,6(对应这里的8,9,10)
-   Delete_Case7(p_node);
+	if(p_node != nullptr && p_node->color_tag == BLACK){
+		My_RB_Tree_Node<T>* S = Find_Node_S_byP(p_node);
+		if(S != nullptr && S->color_tag == RED)
+		{
+			if(p_node->right_child == S)Left_Rotate(S);
+			else Right_Rotate(S);
+			//我的旋转算法使得调用后 原来的P指针指向保存S节点的值，S指针指向保存P点的值 保存S节点的值是红色，保存P值的节点是黑色
+			S->color_tag = RED;
+			p_node->color_tag = BLACK;
+			p_node = S;
+		}
+	}
+	//由于N多了一个兄弟 SL和SR都是孩子,N的P变成了红色,S变成了SL Black孩子 ,BR变成了 RB 的情况,按照wiki上的转情况4,5,6(对应这里的8,9,10)
+	return Delete_Case7(p_node);
 }
 
 //2-2-2
@@ -337,7 +341,7 @@ void RB_Tree<T>::Delete_Case6(My_RB_Tree_Node<T>* p_node)
 template<class T>
 void RB_Tree<T>::Delete_Case7(My_RB_Tree_Node<T>* p_node)
 {
-    if(p_node->color_tag == BLACK){
+    if(p_node != nullptr && p_node->color_tag == BLACK){
         My_RB_Tree_Node<T>* S = Find_Node_S_byP(p_node);
         if(S != nullptr && S->color_tag == BLACK && is_Black(S->left_child) && is_Black(S->right_child))
         {
@@ -355,7 +359,7 @@ void RB_Tree<T>::Delete_Case7(My_RB_Tree_Node<T>* p_node)
 template<class T>
 void RB_Tree<T>::Delete_Case8(My_RB_Tree_Node<T>* p_node)
 {
-	if (p_node->color_tag == RED)
+	if (p_node != nullptr && p_node->color_tag == RED)
 	{
 		My_RB_Tree_Node<T>* S = Find_Node_S_byP(p_node);
 		if (S != nullptr && S->color_tag == BLACK && is_Black(S->left_child) && is_Black(S->right_child))
@@ -369,10 +373,10 @@ void RB_Tree<T>::Delete_Case8(My_RB_Tree_Node<T>* p_node)
 	return Delete_Case9(p_node);
 }
 
-
+//在PS为 RB或BB的情况下 考虑SL,SR
 //2-2-2
 //-4 P:R S:B -> RB   ||   -3 P:B S:B -> BB
-//-2 假设SL,SR为RB的组合(其中B必为黑空叶子) 注意：[!2-2-2-3-2~4 SL,SR为RB BR RR三种情况还没讨论 即有P为R或B!] (R/B)->B(右)->(RB) (R/B)->B(左)->(BR) 把这两个都调整为(R/B)->B->R->(B)
+//-2 假设SL,SR为RB的组合(其中B必为黑空叶子) 分(R/B)->(右)B->(RB) || (R/B)->(左)B->(BR) 把这两个都调整为(R/B)->B->R->(B)
 template<class T>
 void RB_Tree<T>::Delete_Case9(My_RB_Tree_Node<T>* p_node)
 {
@@ -386,6 +390,7 @@ void RB_Tree<T>::Delete_Case9(My_RB_Tree_Node<T>* p_node)
 				S->left_child->color_tag = BLACK;
 				S->color_tag = RED;
 				Right_Rotate(S->left_child);
+				//我的旋转算法使得P永远是P 此处S为逻辑上的P
 			}
 			else if (S == S->father_node->left_child && is_Black(S->left_child) && !is_Black(S->right_child))
 			{
@@ -393,9 +398,9 @@ void RB_Tree<T>::Delete_Case9(My_RB_Tree_Node<T>* p_node)
 				S->color_tag = RED;
 				Left_Rotate(S->right_child);
 			}
+			return Delete_Case10(p_node);
 		}
 	}
-	return Delete_Case10(p_node);
 }
 
 
