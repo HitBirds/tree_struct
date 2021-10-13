@@ -16,7 +16,8 @@ RB_Tree<T>::~RB_Tree()
 
 /*
 * 左旋 P,R不为空
-* 只是更改R所指向节点里指针的指向，不更改指针R本身的值和颜色
+* 只是更改R和P所指向节点里指针的指向和成员值，不更改指针R或P本身的指向
+* R指向的空间里保存的是旧的*P的内容
 */
 template<class T>
 void RB_Tree<T>::Left_Rotate(My_RB_Tree_Node<T>* r_node)
@@ -26,8 +27,11 @@ void RB_Tree<T>::Left_Rotate(My_RB_Tree_Node<T>* r_node)
 	if (r_node == nullptr || r_node->father_node == nullptr)return;
 	My_RB_Tree_Node<T>* p = r_node->father_node;
 	T tmp = p->data;
+    RB_COLOR tempc = p->color_tag;
 	p->data = p->right_child->data;
+    p->color_tag = p->right_child->color_tag;
 	p->right_child->data = tmp;
+    p->right_child->color_tag = tempc;
 
 	My_RB_Tree_Node<T>* pl= p->left_child;
 	p->left_child = p->right_child;
@@ -42,7 +46,8 @@ void RB_Tree<T>::Left_Rotate(My_RB_Tree_Node<T>* r_node)
 
 /*
 * 右旋 P,L不为空
-* 只是更改L所指向节点里指针的指向，不更改指针L本身的值和颜色
+* 只是更改L所指向节点里指针的指向和成员值，不更改指针L或P本身的指向
+* L指向的空间里保存的是旧的*P的内容
 */
 template<class T>
 void RB_Tree<T>::Right_Rotate(My_RB_Tree_Node<T>* l_node)
@@ -155,19 +160,26 @@ void RB_Tree<T>::Insert_Case3(My_RB_Tree_Node<T>* n_node)
 template<class T>
 void RB_Tree<T>::Insert_Case4(My_RB_Tree_Node<T>* n_node)
 {
-	//3.2.1若N是P的右子 左旋N,P 变 N为P,  P为N的左子，  转3.2.2
-	if (n_node == n_node->father_node->right_child)Left_Rotate(n_node);
-	return Insert_Case5(n_node->left_child);
+    //3.2.1若N是P的右子 左旋N,P 变 N为P,  P为G的左子，  转3.2.2
+    if (n_node == n_node->father_node->right_child && n_node->father_node == n_node->father_node->father_node->left_child)Left_Rotate(n_node);
+    else if(n_node == n_node->father_node->left_child && n_node->father_node == n_node->father_node->father_node->right_child)Right_Rotate(n_node);
+    return Insert_Case5(n_node);
 }
 
-//case  3.2.2 N,P红,U黑(空) N为左子
+//case  3.2.2 N,P红,U黑(空) 分P为左子或右
 template<class T>
 void RB_Tree<T>::Insert_Case5(My_RB_Tree_Node<T>* n_node)
 {
 	//右旋P,G,对调颜色
-	Right_Rotate(n_node->father_node);
-	n_node->father_node->color_tag = BLACK;
-	n_node->father_node->right_child->color_tag = RED;
+    if(n_node->father_node == n_node->father_node->father_node->left_child){
+        Right_Rotate(n_node->father_node);
+        n_node->father_node->color_tag = BLACK;
+        n_node->father_node->right_child->color_tag = RED;
+    }else{
+        Left_Rotate(n_node->father_node);
+        n_node->father_node->color_tag = BLACK;
+        n_node->father_node->left_child->color_tag = RED;
+    }
 	return;
 }
 
