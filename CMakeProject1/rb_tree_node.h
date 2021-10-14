@@ -5,11 +5,11 @@
 */
 enum RB_COLOR { Null, RED = 1, BLACK };
 
-template<class T>
+template<typename T>
 class My_RB_Tree_Node {
 
 public:
-    My_RB_Tree_Node(T data_in=0);
+    My_RB_Tree_Node(T data_in);
 	~My_RB_Tree_Node();
 	T data;
     My_RB_Tree_Node* father_node, *left_child, *right_child;

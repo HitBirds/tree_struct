@@ -2,18 +2,18 @@
 #include <vector>
 using namespace std;
 #include "rb_tree_node.h"
+#include "rb_tree_node.cpp"
 /*
  *封装RB_NODE的树结构
  *数据成员:root
  *操作:初始化，析构，左旋转，右旋转，插入节点，删除节点，
  *中序遍历，清空节点数据,查找结点
 */
-template<class T>
+template<typename T>
 class RB_Tree
 {
 public:
 	My_RB_Tree_Node<T>* root;
-    RB_Tree();
 	RB_Tree(T root_data);
 	~RB_Tree();
 	void Left_Rotate(My_RB_Tree_Node<T>* r_node);
@@ -28,22 +28,22 @@ public:
     void print_Tree();
 private:
 	//插入时导致不平衡的调整
-	void Insert_Case1(My_RB_Tree_Node<T>* n_node);
-	void Insert_Case2(My_RB_Tree_Node<T>* n_node);
-	void Insert_Case3(My_RB_Tree_Node<T>* n_node);
-	void Insert_Case4(My_RB_Tree_Node<T>* n_node);
-	void Insert_Case5(My_RB_Tree_Node<T>* n_node);
+	int Insert_Case1(My_RB_Tree_Node<T>* n_node);
+	int Insert_Case2(My_RB_Tree_Node<T>* n_node);
+	int Insert_Case3(My_RB_Tree_Node<T>* n_node);
+	int Insert_Case4(My_RB_Tree_Node<T>* n_node);
+	int Insert_Case5(My_RB_Tree_Node<T>* n_node);
 	//删除时导致不平衡的调整
-	void Delete_Case1(My_RB_Tree_Node<T>* p_node);
-	void Delete_Case2(My_RB_Tree_Node<T>* p_node);
-	void Delete_Case3(My_RB_Tree_Node<T>* p_node);
-	void Delete_Case4(My_RB_Tree_Node<T>* p_node);
-	void Delete_Case5(My_RB_Tree_Node<T>* p_node);
-    void Delete_Case6(My_RB_Tree_Node<T>* p_node);
-    void Delete_Case7(My_RB_Tree_Node<T>* p_node);
-    void Delete_Case8(My_RB_Tree_Node<T>* p_node);
-	void Delete_Case9(My_RB_Tree_Node<T>* p_node);
-	void Delete_Case10(My_RB_Tree_Node<T>* p_node);
+	int Delete_Case1(My_RB_Tree_Node<T>* p_node);
+	int Delete_Case2(My_RB_Tree_Node<T>* p_node);
+	int Delete_Case3(My_RB_Tree_Node<T>* p_node);
+	int Delete_Case4(My_RB_Tree_Node<T>* p_node);
+	int Delete_Case5(My_RB_Tree_Node<T>* p_node);
+	int Delete_Case6(My_RB_Tree_Node<T>* p_node);
+	int Delete_Case7(My_RB_Tree_Node<T>* p_node);
+	int Delete_Case8(My_RB_Tree_Node<T>* p_node);
+	int Delete_Case9(My_RB_Tree_Node<T>* p_node);
+	int Delete_Case10(My_RB_Tree_Node<T>* p_node);
 	
     //判断黑 隐式内联
     bool is_Black(My_RB_Tree_Node<T>* c)
