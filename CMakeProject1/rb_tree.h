@@ -13,6 +13,7 @@ class RB_Tree
 {
 public:
 	My_RB_Tree_Node<T>* root;
+    RB_Tree();
 	RB_Tree(T root_data);
 	~RB_Tree();
 	void Left_Rotate(My_RB_Tree_Node<T>* r_node);
@@ -21,7 +22,10 @@ public:
 	int Delete_Node(T delete_data);
 	My_RB_Tree_Node<T>* Search_Node(T sr_data);
 	//中序遍历 输入root* 和 vector*，结果vector里保存了中序遍历的节点顺序，也可以自己用二级指针来实现vector
-	void Mid_Traversal(My_RB_Tree_Node<T>* root, vector<My_RB_Tree_Node<T>*>* mid_vec);
+    void Mid_Traversal(vector<My_RB_Tree_Node<T>*>* mid_vec){Mid_Traversal(mid_vec, root);}
+    void Mid_Traversal(vector<My_RB_Tree_Node<T>*>* mid_vec, My_RB_Tree_Node<T>* root);
+    //打印树
+    void print_Tree();
 private:
 	//插入时导致不平衡的调整
 	void Insert_Case1(My_RB_Tree_Node<T>* n_node);
@@ -57,4 +61,6 @@ private:
 
 	//清空节点数据
 	void erase_Node(My_RB_Tree_Node<T>* current_node);
+
+
 };

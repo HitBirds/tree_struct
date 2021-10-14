@@ -1,6 +1,16 @@
 ﻿#include <vector>
-using namespace std;
+#include <iostream>
+#include <queue>
 #include "rb_tree.h"
+#include "rb_tree_node.h"
+using namespace std;
+
+template<class T>
+RB_Tree<T>::RB_Tree()
+{
+    this->root = new My_RB_Tree_Node<T>();
+}
+
 template<class T>
 RB_Tree<T>::RB_Tree(T root_data)
 {
@@ -446,7 +456,7 @@ My_RB_Tree_Node<T>* RB_Tree<T>::Search_Node(T sr_data)
 
 //中序遍历 输入root* 和 vector*，结果vector里保存了中序遍历的节点顺序
 template<class T>
-void RB_Tree<T>::Mid_Traversal(My_RB_Tree_Node<T>* root, vector<My_RB_Tree_Node<T>*>* mid_vec)
+void RB_Tree<T>::Mid_Traversal(vector<My_RB_Tree_Node<T>*>* mid_vec, My_RB_Tree_Node<T>* root)
 {
 	if (root == nullptr)return;
 	Mid_Traversal(root->left_child, mid_vec);
@@ -509,4 +519,41 @@ void RB_Tree<T>::erase_Node(My_RB_Tree_Node<T>* current_node)
 	current_node->father_child = nullptr;
 	current_node->left_child = nullptr;
 	current_node->right_child = nullptr;
+}
+
+template<class T>
+void RB_Tree<T>::print_Tree()
+{
+    int prev_cnt(0),cur_cnt(0);
+    queue<My_RB_Tree_Node<T>*> q;
+    if(root != nullptr){
+        q.push(root);
+        prev_cnt += 1;
+    }
+    while(!q.empty())
+    {
+        My_RB_Tree_Node<T>* cur=q.front();
+        q.pop();
+        cout<<cur->data;
+        prev_cnt-=1;
+        if(cur->left_child != nullptr)
+        {
+            q.push(cur->left_child);
+            ++cur_cnt;
+        }
+        if(cur->right_child != nullptr)
+        {
+            q.push(cur->right_child);
+            ++cur_cnt;
+        }
+        if(prev_cnt == 0)
+        {
+            cout<<endl;
+            prev_cnt = cur_cnt;
+            cur_cnt = 0;
+        }
+        else{
+            cout<<'\b';
+        }
+    }
 }
