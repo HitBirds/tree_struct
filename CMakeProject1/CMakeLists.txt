@@ -3,9 +3,10 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")	
 project ("CMakeProject1")
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (CMakeProject1 "main.cpp" "main.h" "rb_tree_node.h" "rb_tree_node.cpp" "rb_tree.h"  "rb_tree.cpp")
+add_executable (CMakeProject1 "rb_tree_node.h" "rb_tree_node.cpp" "rb_tree.h"  "rb_tree.cpp"  "main.h" "main.cpp")
 
 # TODO: 如有需要，请添加测试并安装目标。
